@@ -1,7 +1,9 @@
-﻿namespace SmartBooking.API.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace SmartBooking.API.Models
 {
-    public class User
+    public class User: IdentityUser
     {
-        //Will store user class
+        public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

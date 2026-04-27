@@ -1,7 +1,18 @@
-﻿namespace SmartBooking.API.Data
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using SmartBooking.API.Models;
+
+namespace SmartBooking.API.Data
 {
-    public class AppDbContext
+    public class AppDbContext: IdentityDbContext<User>
     {
-        //Main database file
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+
+        }
     }
 }
