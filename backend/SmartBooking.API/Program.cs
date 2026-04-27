@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+using SmartBooking.API.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -19,5 +22,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();
