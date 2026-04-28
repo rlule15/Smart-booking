@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using SmartBooking.API.Data;
+using SmartBooking.API.Interfaces;
 using SmartBooking.API.Models;
+using SmartBooking.API.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,9 +17,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("SmartBookingDb")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 {
     // Password options
     options.Password.RequireDigit = true;
@@ -42,6 +45,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtProvider, JwtProviderService>();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -50,6 +56,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

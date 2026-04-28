@@ -42,9 +42,6 @@ namespace SmartBooking.API.Data
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            builder.Entity<IdentityRole<Guid>>().HasData(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN" },
-                new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Customer", NormalizedName = "CUSTOMER" });
-
         }
     }
 }
