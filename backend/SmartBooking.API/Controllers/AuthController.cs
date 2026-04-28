@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using SmartBooking.API.DTOs;
+using SmartBooking.API.Exceptions;
 using SmartBooking.API.Interfaces;
 using SmartBooking.API.Services;
 
@@ -17,11 +20,17 @@ namespace SmartBooking.API.Controllers
 
 
         [HttpPost("signup")]
-        public async Task<IActionResult> SignUp(string email,string firstName, string lastName, string password)
+        public async Task<IActionResult> SignUp(UserRegisterDto userRegisterDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
-                await _authService.SignUpAsync(email,firstName, lastName, password);
+
+                await _authService.SignUpAsync(userRegisterDto.Email, userRegisterDto.FirstName, userRegisterDto.LastName, userRegisterDto.Password);
                 return Ok(new { message = "User created successfully" });
 
             }
@@ -32,14 +41,31 @@ namespace SmartBooking.API.Controllers
         }
 
         [HttpPost("signin")]
-        public async Task<IActionResult> SignIn(string email, string password)
+        public async Task<IActionResult> SignIn(UserSignInDto userSignInDto)
         {
-            var token = await _authService.SignInAsync(email, password);
-            if (token == null)
+            if (!ModelState.IsValid)
             {
-                return Unauthorized(new { message = "Invalid email or password" });
+                return BadRequest(ModelState);
             }
-            return Ok(new { token });
+
+            try
+            {
+                var result = await _authService.SignInAsync(userSignInDto.Email, userSignInDto.Password);
+
+                if (result == null)
+                {
+                    return Unauthorized(new { message = "Invalid email or password" });
+                }
+
+                return Ok(result);
+            }catch(TokenGenerationException ex)
+            {
+                return Problem(detail: ex.Message, statusCode: 500);
+            }
+            catch(Exception)
+            {
+                return Problem(detail: "An unexcpeted error occured.", statusCode: 500);
+            }
         }
     }
 }

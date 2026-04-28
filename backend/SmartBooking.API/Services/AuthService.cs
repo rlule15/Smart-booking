@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SmartBooking.API.DTOs;
 using SmartBooking.API.Interfaces;
 using SmartBooking.API.Models;
 
@@ -19,7 +20,7 @@ namespace SmartBooking.API.Services
 
         public async Task SignUpAsync(string email,string firstName, string lastName, string password)
         {
-            var existingUser = _userManager.FindByEmailAsync(email);
+            var existingUser = await _userManager.FindByEmailAsync(email);
             if (existingUser != null)
             {
                 throw new Exception("User with email alrady exists.");
@@ -33,7 +34,7 @@ namespace SmartBooking.API.Services
             }
         }
 
-        public async Task<string?> SignInAsync(string email, string password)
+        public async Task<UserResponseDto?> SignInAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -48,8 +49,8 @@ namespace SmartBooking.API.Services
             {
                 return null;
             }
-
-            return _jwtProvider.GenerateToken(user);
+            var token = _jwtProvider.GenerateToken(user);
+            return new UserResponseDto(token);
         }
     }
 }
